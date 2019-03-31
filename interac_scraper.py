@@ -14,7 +14,18 @@ SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 
 def get_interac_payments_from_gmail(mindate=None):
     """
+    Function to get a summary of interac payments sent to a specific
+    g-mail account.
 
+    Arguments:
+    ----------
+    mindate: None or str
+        Minimum date to look for transactions from
+
+    Returns:
+    --------
+    Transactions: pd.DataFrame
+        A pandas DataFrame of the interac logs.
     """
     transactions = pd.DataFrame(columns=['id', 'Payer', 'Amount', 'Date'])
     creds = None
