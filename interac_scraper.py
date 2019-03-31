@@ -1,3 +1,4 @@
+import argparse
 import os.path
 import pandas as pd
 import pickle
@@ -9,6 +10,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
+
 
 def get_interac_payments_from_gmail(mindate=None):
     """
@@ -37,7 +39,7 @@ def get_interac_payments_from_gmail(mindate=None):
     service = build('gmail', 'v1', credentials=creds)
     query = "from:notify@payments.interac.ca "
     if mindate:
-         query += ' after:'+mindate
+        query += ' after:'+mindate
     results = service.users().messages().list(userId='me',
                                               q=query).execute()
     if 'messages' in results.keys():
@@ -46,25 +48,25 @@ def get_interac_payments_from_gmail(mindate=None):
                                                id=message_id['id']).execute()
 
             snippet = m['snippet']
-            whomatch = re.search(', (.*) has sent you an INTERAC e-Transfer.',
+            whomatch = re.search(r', (.*) has sent you an INTERAC e-Transfer.',
                                  snippet)
             who = whomatch.group(1) if whomatch else None
-            amountmatch = re.search('Amount: \$(.*) \(CAD\)', snippet)
+            amountmatch = re.search(r'Amount: \$(.*) \(CAD\)', snippet)
             amount = float(amountmatch.group(1) if amountmatch else None)
             date = time.strftime('%Y-%m-%d %H:%M:%S',
                                  time.gmtime(int(m['internalDate'])/1000))
             g_id = m['id']
-            transactions = transactions.append({'id':g_id,
-                                                'Payer':who,
-                                                'Amount':amount,
-                                                'Date':date},
-                                                ignore_index=True)
+            transactions = transactions.append({'id': g_id,
+                                                'Payer': who,
+                                                'Amount': amount,
+                                                'Date': date},
+                                               ignore_index=True)
     else:
         print('No messages found.')
     transactions['Date'] = pd.to_datetime(transactions['Date'])
     return transactions
 
-import argparse
+
 parser = argparse.ArgumentParser()
 parser.add_argument("-o", "--output",
                     help="Name of output csv.")
