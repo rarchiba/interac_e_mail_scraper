@@ -16,4 +16,5 @@ Usage
 
 2. pip install -r requirements.txt
 
-3. Run the program. Bu default, it outputs a csv of the results
+3. Run the program:
+  python interac_scraper.py
